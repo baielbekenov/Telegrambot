@@ -1,70 +1,66 @@
 import telebot
-from decouple import config
+import config
+import random
 from telebot import types
-bot = telebot.TeleBot(
-    token=config('TOKEN_BOT')
-)
+bot = telebot.TeleBot(config.TOKEN)
 
-@bot.message_handler(commands=['start', 'Привет', 'Hi'])
-def answer_start(message):
-    print(message.from_user.username)
-    text = f"Добро пожаловать в бота {message.from_user.username} !!!" \
-            f"Выберите тот курс на который хотите пойти"
-    keyboard_in = types.InlineKeyboardMarkup()
-    btn_1 = types.InlineKeyboardButton(text='Python', callback_data='python')
-    btn_2 = types.InlineKeyboardButton(text='Java', callback_data='java')
-    btn_3 = types.InlineKeyboardButton(text='C++', callback_data='c++')
-    keyboard_in.add(btn_1, btn_2, btn_3)
-    bot.send_message(message.chat.id, text, reply_markup=keyboard_in)
+@bot.message_handler(commands=['start'])
+def welcome(message):
+    sti = open('welcome.webp/Privet.webp', 'rb')
+    bot.send_sticker(message.chat.id, sti)
 
-@bot.callback_query_handler(func=lambda call:True)
-def send_course(call):
-    if call.data == 'python':
-        murkup_reply = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        btn_1 = types.KeyboardButton('python morning')
-        btn_2 = types.KeyboardButton('python evening')
-        btn_3 = types.KeyboardButton('python bootcamp')
-        murkup_reply.add(btn_1, btn_2, btn_3)
-        text = f'Вы выбрали {call.data}! теперь необходимо выбрать группу!!!'
-        bot.send_message(call.message.chat.id, text, reply_markup=murkup_reply)
-    elif call.data == 'java':
-        murkup_reply = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        btn_1 = types.KeyboardButton('java morning')
-        btn_2 = types.KeyboardButton('java evening')
-        btn_3 = types.KeyboardButton('java bootcamp')
-        murkup_reply.add(btn_1, btn_2, btn_3)
-        text = f'Вы выбрали {call.data}! теперь необходимо выбрать группу!!!'
-        bot.send_message(call.message.chat.id, text, reply_markup=murkup_reply)
-    elif call.data == 'c++':
-        murkup_reply = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        btn_1 = types.KeyboardButton('c++ morning')
-        btn_2 = types.KeyboardButton('c++ evening')
-        btn_3 = types.KeyboardButton('c++ bootcamp')
-        murkup_reply.add(btn_1, btn_2, btn_3)
-        text = f'Вы выбрали {call.data}! теперь необходимо выбрать группу!!!'
-        bot.send_message(call.message.chat.id, text, reply_markup=murkup_reply)
+    #keyboard
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    item1 = types.KeyboardButton("Рандомное число")
+    item2 = types.KeyboardButton("Как дела?")
 
+    markup.add(item1, item2)
+    bot.send_message(message.chat.id, f"Добро пожаловать {message.from_user.username}"
+                                      f"я бот созданный чтобы отвечать на ваши вопросы! \U0001F604", parse_mode='html', reply_markup=markup)
 
 @bot.message_handler(content_types=['text'])
-def send_good_message(message):
-    if message.text == 'python morning':
-        bot.send_message(message.chat.id, f'вас записали на курс python morning менеджер свами свяжется!')
-    elif message.text == 'python evening':
-        bot.send_message(message.chat.id, f'вас записали на курс python evening менеджер свами свяжется!')
-    elif message.text == 'python bootcamp':
-        bot.send_message(message.chat.id, f'вас записали на курс python bootcamp менеджер свами свяжется!')
-    elif message.text == 'java morning':
-        bot.send_message(message.chat.id, f'вас записали на курс java morning менеджер свами свяжется!')
-    elif message.text == 'java evening':
-        bot.send_message(message.chat.id, f'вас записали на курс java evening менеджер свами свяжется!')
-    elif message.text == 'java bootcamp':
-        bot.send_message(message.chat.id, f'вас записали на курс java bootcamp менеджер свами свяжется!')
-    elif message.text == 'c++ morning':
-        bot.send_message(message.chat.id, f'вас записали на курс c++ morning менеджер свами свяжется!')
-    elif message.text == 'c++ evening':
-        bot.send_message(message.chat.id, f'вас записали на курс c++ evening менеджер свами свяжется!')
-    elif message.text == 'c++ bootcamp':
-        bot.send_message(message.chat.id, f'вас записали на курс c++ bootcamp менеджер свами свяжется!')
+def lalala(message):
+    if message.chat.type == 'private':
+        if message.text == 'Рандомное число':
+            bot.send_message(message.chat.id, str(random.randint(0, 100)))
+        elif message.text == 'Как дела?':
+
+            markup = types.InlineKeyboardMarkup(row_width=2)
+            item1 = types.InlineKeyboardButton("Хорошо", callback_data='good')
+            item2 = types.InlineKeyboardButton("Не очень", callback_data='bad')
+
+            markup.add(item1, item2)
+
+            bot.send_message(message.chat.id, 'Отлично сам как?', reply_markup=markup)
+        elif message.text == 'Какие планы на выходные?':
+            bot.send_message(message.chat.id, "Я не знаю! Что предложишь? \U0001F64B")
+        elif message.text == 'Может в горы?':
+            bot.send_message(message.chat.id, "Нее, я уже сходил!")
+            bot.send_message(message.chat.id, "Давай в клуб!")
+        elif message.text == 'Расскажи анекдот!':
+            bot.send_message(message.chat.id, "Возвращается домой пьяный мужик. Дверь открывает жена. Тут мужик берет и захлопывает дверь:"
+                                                "— Откуда пришла — там и ночуй! \U0001F602")
+        else:
+            bot.send_message(message.chat.id, 'Я не знаю что ответить! \U0001F609')
+
+@bot.callback_query_handler(func=lambda call:True)
+def callback_inline(call):
+    try:
+        if call.message:
+            if call.data == 'good':
+                bot.send_message(call.message.chat.id, 'Каааайф')
+            elif call.data == 'bad':
+                bot.send_message(call.message.chat.id, 'Ну фигово! справляйся!')
+
+            #remove inline buttons
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Как дела?",
+                                  reply_markup=None)
+
+    except Exception as e:
+        print(repr(e))
 
 
-bot.polling()
+# RUN
+bot.polling(none_stop=True)
+
+
